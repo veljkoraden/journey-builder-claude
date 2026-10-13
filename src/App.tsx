@@ -92,6 +92,7 @@ export default function App() {
 
       {selectedNode && editingField && modalContext && (
         <PrefillModal
+          key={JSON.stringify([selectedNode.id, editingField.name])}
           fieldTitle={editingField.title}
           providers={providerState.providers}
           context={modalContext}
