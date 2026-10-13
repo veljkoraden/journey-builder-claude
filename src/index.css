@@ -1,0 +1,54 @@
+:root {
+  --bg: #f5f6f8;
+  --surface: #ffffff;
+  --border: #d9dce1;
+  --text: #1d2129;
+  --muted: #6b7280;
+  --accent: #2563eb;
+  --accent-soft: #e8effe;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color: var(--text);
+}
+
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); }
+
+.app { max-width: 920px; margin: 0 auto; padding: 24px; }
+.app--message { padding-top: 80px; text-align: center; color: var(--muted); }
+.app__header h1 { font-size: 20px; margin: 0 0 16px; }
+.app__body { display: grid; grid-template-columns: 220px 1fr; gap: 20px; align-items: start; }
+.app__hint, .app__detail { color: var(--muted); }
+
+.form-list__title, .prefill-editor__title { font-size: 14px; text-transform: uppercase; letter-spacing: 0.04em; color: var(--muted); margin: 0 0 8px; }
+.form-list__items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.form-list__item { width: 100%; text-align: left; padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); cursor: pointer; font-size: 14px; }
+.form-list__item--active { border-color: var(--accent); background: var(--accent-soft); color: var(--accent); font-weight: 600; }
+
+.prefill-editor { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 16px; }
+.prefill-editor__title { color: var(--text); text-transform: none; letter-spacing: 0; font-size: 16px; margin-bottom: 2px; }
+.prefill-editor__subtitle { margin: 0 0 12px; color: var(--muted); font-size: 13px; }
+.prefill-editor__fields { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+
+.prefill-field { display: flex; align-items: stretch; gap: 8px; }
+.prefill-field__main { flex: 1; display: flex; flex-direction: column; gap: 2px; text-align: left; padding: 10px 12px; border: 1px dashed var(--border); border-radius: 8px; background: var(--surface); cursor: pointer; }
+.prefill-field--set .prefill-field__main { border-style: solid; background: var(--accent-soft); }
+.prefill-field__name { font-weight: 600; font-size: 14px; }
+.prefill-field__value { font-size: 13px; color: var(--accent); }
+.prefill-field__placeholder { font-size: 13px; color: var(--muted); }
+.prefill-field__clear { width: 36px; border: 1px solid var(--border); border-radius: 8px; background: var(--surface); cursor: pointer; font-size: 18px; line-height: 1; color: var(--muted); }
+.prefill-field__clear:hover { color: #dc2626; border-color: #dc2626; }
+
+.modal-backdrop { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.45); display: flex; align-items: center; justify-content: center; padding: 24px; }
+.modal { width: 100%; max-width: 480px; max-height: 80vh; display: flex; flex-direction: column; background: var(--surface); border-radius: 12px; padding: 16px; }
+.modal__header { display: flex; justify-content: space-between; align-items: center; }
+.modal__title { font-size: 16px; margin: 0; }
+.modal__close { border: none; background: none; font-size: 22px; cursor: pointer; color: var(--muted); }
+.modal__search { margin: 12px 0; padding: 8px 10px; border: 1px solid var(--border); border-radius: 8px; font-size: 14px; }
+.modal__groups { overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+.modal__group { border: 1px solid var(--border); border-radius: 8px; margin: 0; padding: 8px 12px; }
+.modal__group-label { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+.modal__badge { font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.03em; color: var(--accent); background: var(--accent-soft); padding: 1px 6px; border-radius: 999px; }
+.modal__options { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 2px; }
+.modal__option { width: 100%; text-align: left; padding: 6px 8px; border: none; border-radius: 6px; background: none; cursor: pointer; font-size: 14px; }
+.modal__option:hover { background: var(--accent-soft); color: var(--accent); }
+.modal__empty { color: var(--muted); font-size: 14px; }
