@@ -26,7 +26,7 @@ Each phase below should include its relevant tests and a clear commit message.
 
 ## Phase 1: Define source eligibility
 
-Status: implemented, pending pull-request review. Validation: 42 tests across six
+Status: merged; the following validation describes this phase at completion. Validation: 42 tests across six
 files and the production build pass. Runtime configuration and modal confirmation
 remain deferred to subsequent phases. No browser/mock-server acceptance is claimed.
 
@@ -46,7 +46,7 @@ self references/cycles, and field eligibility.
 
 ## Phase 2: Configure provider activation
 
-Status: implemented, pending pull-request review. All 99 tests and the production
+Status: merged; the following validation describes this phase at completion. All 99 tests and the production
 build pass. A built-file HTTP check confirmed JSON changes without a JavaScript
 rebuild. See [the Phase 2 summary](phase-2-summary.md) for behavior and limitations.
 
@@ -69,7 +69,7 @@ The runtime file is loaded at startup; live configuration editing is not require
 
 ## Phase 3: Complete mapping interactions
 
-Status: implemented, pending pull-request review. All 119 tests and the production
+Status: merged; the following validation describes this phase at completion. All 119 tests and the production
 build pass. Desktop/mobile Chrome checks used the official graph fixture via
 request interception. See [the Phase 3 summary](phase-3-summary.md) and screenshots.
 
@@ -95,7 +95,7 @@ enabled state per node. Do not prioritize it over the required mapping flow.
 
 ## Phase 4: Prove the complete workflow
 
-Status: implemented, pending pull-request review. All 142 tests and the production
+Status: merged; the following validation describes this phase at completion. All 142 tests and the production
 build pass. Chrome verified mapping flows against the existing mock server over
 real HTTP/CORS; error/empty browser scenarios used explicit interception. See
 [the Phase 4 summary](phase-4-summary.md) for evidence and limitations.
@@ -115,6 +115,10 @@ suite and production build pass. Manual browser validation against the mock
 server is recorded separately from automated test evidence.
 
 ## Phase 5: Document and prepare the submission
+
+Status: implemented, pending pull-request review. See [the Phase 5 summary](phase-5-summary.md),
+[provider tutorial](provider-extension.md), and [submission guide](submission-guide.md).
+Phases 1–4 are merged; Phase 5 merge remains a separate review step.
 
 Suggested commit: `docs: explain prefill configuration and extension`
 

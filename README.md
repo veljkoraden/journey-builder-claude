@@ -6,20 +6,24 @@ view and edit the **prefill mapping** for each form's fields. Prefill sources
 are pluggable: enable, disable, or reorder existing sources through runtime JSON
 configuration. New implementations are added through the provider registry.
 
-## Implementation roadmap
+## Review and demonstration
 
-See [the phased implementation plan](docs/implementation-plan.md) for planned
-improvements, acceptance criteria, and suggested commit messages. Phase 1 separates
-source eligibility and dependency providers. Phase 2 adds runtime configuration;
-see [the Phase 2 explanation](docs/phase-2-summary.md). Phase 3 adds confirmed
-selection and keyboard interaction; see [the Phase 3 explanation](docs/phase-3-summary.md).
-Phase 4 adds official-fixture acceptance tests and a real mock-server browser
-check; see [the Phase 4 explanation](docs/phase-4-summary.md). Final handoff remains
-Phase 5.
+- [Submission and demonstration guide](docs/submission-guide.md)
+- [Provider extension tutorial](docs/provider-extension.md)
+- [Implementation plan and phase summaries](docs/implementation-plan.md)
+- [Phase 5 validation and handoff](docs/phase-5-summary.md)
+
+The app configures where a field's prefill should come from. It does not submit
+forms, fetch submitted values, or persist mappings. The implementation started
+from the supplied Claude-generated project; focused improvements are documented
+by phase and commit.
 
 ---
 
 ## Running locally
+
+Verified with Node.js **22.22.2** and npm **10.9.7**. Use Node 22 for the documented
+setup. Install Git and Node/npm first. Run the server and app in separate terminals.
 
 ### 1. Start the mock server
 
@@ -35,15 +39,33 @@ npm start            # serves the blueprint graph on http://localhost:3000
 ### 2. Start this app
 
 ```bash
-npm install
+git clone https://github.com/veljkoraden/journey-builder-claude
+cd journey-builder-claude
+npm ci
 cp .env.example .env  # optional — defaults already point at localhost:3000
 npm run dev           # http://localhost:5173
 ```
 
 The endpoint URL is built from environment variables (see `.env.example`).
 The mock server returns the same `graph.json` regardless of the path params,
-but `VITE_TENANT_ID` / `VITE_BLUEPRINT_ID` are kept configurable so the same
-client works against a real backend.
+and `VITE_TENANT_ID` / `VITE_BLUEPRINT_ID` are configurable path parameters.
+This has been tested against the mock, not an authenticated production backend.
+Use a base URL without a trailing slash. `VITE_*` values are included in browser
+code: changing them requires restarting the dev server or rebuilding production
+assets, unlike the separate runtime source configuration. Do not put secrets in them.
+
+To verify the app and serve the production build:
+
+```bash
+npm run test:run
+npm run typecheck
+npm run build
+npm run preview -- --host 127.0.0.1
+```
+
+Preview normally uses `http://localhost:4173`. Keep the mock server on port 3000.
+If loading fails, check the mock server and the network request; if configuration
+fails, check `prefill-config.json` and reload. Tests use fixtures and need no server.
 
 ### Scripts
 
@@ -140,7 +162,8 @@ A provider is handed a context (the graph, the target node, and a node→form
 resolver) and returns groups of selectable options. The UI never knows what a
 provider does internally — it just renders whatever groups come back. Selecting
 an option stores a `PrefillSource` (`providerId` + opaque `optionKey` +
-display label), which is enough to resolve the actual value later.
+display label). This records source identity; runtime value resolution is not
+implemented in this challenge.
 
 All available implementations live in one registry:
 
@@ -188,52 +211,14 @@ not contain secrets. This controls source availability, not authorization.
 
 ## Adding a new data source
 
-Suppose you want to add a "Tenant settings" source.
+Follow the [provider extension tutorial](docs/provider-extension.md): implement
+`PrefillProvider`, import/register it in the available catalog, then enable its ID
+in `prefill-config.json`. New implementations require a build; choosing between
+already registered implementations does not.
 
-1. **Implement a provider** in `src/prefill/providers/tenantSettings.ts`:
-
-   ```ts
-   import type { PrefillProvider } from "../types";
-
-   export const tenantSettingsProvider: PrefillProvider = {
-     id: "tenant_settings",
-     label: "Tenant settings",
-     getOptionGroups: () => [
-       {
-         id: "tenant",
-         label: "Tenant Settings",
-         options: [
-           { key: "tenant:locale", label: "locale" },
-           { key: "tenant:timezone", label: "timezone" },
-         ],
-       },
-     ],
-   };
-   ```
-
-   A provider may use the `context` (graph / target node / form resolver) to
-   compute options dynamically — that is exactly how the dependency providers
-   walk the DAG.
-
-2. **Register it** by appending to the array in
-   `src/prefill/providers/index.ts`:
-
-   ```ts
-   export const availablePrefillProviders: readonly PrefillProvider[] = [
-     directFormFieldsProvider,
-     transitiveFormFieldsProvider,
-     globalDataProvider,
-     tenantSettingsProvider,
-   ];
-   ```
-
-3. **Enable it** by adding `"tenant_settings"` to `enabledSourceIds` in
-   `public/prefill-config.json`.
-
-A new implementation requires a build/deployment. After it is registered,
-activation and ordering require only configuration edits. No picker, resolver,
-hook, or mapping-store changes are needed. The extension integration test shows
-a test-only provider being selected and saved through the existing components.
+The tutorial includes copyable code, identity rules, synchronous-provider limits,
+and testing steps. A test-only tenant provider demonstrates selection and storage
+alone and alongside built-ins, without editing the picker or mapping store.
 
 ---
 
@@ -243,7 +228,12 @@ a test-only provider being selected and saved through the existing components.
 npm run test:run
 ```
 
+The full suite contains 151 tests across 15 files. No mock server is required.
 Tests cover individual layers, runtime configuration, and application workflows:
+
+- `api/client.configuration.test.ts` — documented default/overridden API URLs.
+- `prefill/configuration.deployment.test.ts` — the actual shipped JSON, root/nested/
+  relative base paths, and successive configuration loads.
 
 - `App.acceptance.test.tsx` — the pinned official graph, sorted form discovery,
   loading/network/HTTP/JSON errors, empty and missing data, shared-definition
