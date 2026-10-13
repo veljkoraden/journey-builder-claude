@@ -2,7 +2,7 @@ import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { PrefillModal } from "./PrefillModal";
-import { prefillProviders } from "../prefill/providers";
+import { availablePrefillProviders } from "../prefill/providers";
 import { createFormResolver } from "../graph/formLookup";
 import { sampleGraph, NODE_IDS } from "../mocks/sampleGraph";
 import type { PrefillProviderContext } from "../prefill/types";
@@ -20,7 +20,7 @@ describe("PrefillModal", () => {
     render(
       <PrefillModal
         fieldTitle="Email"
-        providers={prefillProviders}
+        providers={availablePrefillProviders}
         context={context()}
         onSelect={vi.fn()}
         onClose={vi.fn()}
@@ -36,7 +36,7 @@ describe("PrefillModal", () => {
     render(
       <PrefillModal
         fieldTitle="Email"
-        providers={prefillProviders}
+        providers={availablePrefillProviders}
         context={context()}
         onSelect={onSelect}
         onClose={vi.fn()}
@@ -67,7 +67,7 @@ describe("independent dependency sources in the picker", () => {
     render(
       <PrefillModal
         fieldTitle="Email"
-        providers={prefillProviders.filter((provider) => provider.id === id)}
+        providers={availablePrefillProviders.filter((provider) => provider.id === id)}
         context={context()}
         onSelect={onSelect}
         onClose={vi.fn()}

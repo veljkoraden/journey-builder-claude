@@ -4,7 +4,7 @@ import type { PrefillProvider, PrefillProviderContext, PrefillSource } from "../
 interface PrefillModalProps {
   /** Display name of the field being configured (e.g. "Email"). */
   fieldTitle: string;
-  providers: PrefillProvider[];
+  providers: readonly PrefillProvider[];
   context: PrefillProviderContext;
   onSelect: (source: PrefillSource) => void;
   onClose: () => void;
@@ -21,7 +21,7 @@ interface RenderableGroup {
 
 /**
  * Modal for choosing a prefill source for a single field. Aggregates option
- * groups from EVERY registered provider, so new data sources appear here
+ * groups from every enabled provider, so new data sources appear here
  * automatically.
  */
 export function PrefillModal({
@@ -102,7 +102,13 @@ export function PrefillModal({
 
         <div className="modal__groups">
           {filtered.length === 0 && (
-            <p className="modal__empty">No matching data elements.</p>
+            <p className="modal__empty" role="status">
+              {providers.length === 0
+                ? "No prefill sources enabled."
+                : groups.length === 0
+                  ? "No available data elements for this form."
+                  : "No matching data elements."}
+            </p>
           )}
           {filtered.map((group) => (
             <fieldset key={`${group.providerId}:${group.groupId}`} className="modal__group">

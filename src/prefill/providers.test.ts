@@ -2,7 +2,7 @@ import { describe, expect, it } from "vitest";
 import { sampleGraph, NODE_IDS } from "../mocks/sampleGraph";
 import { createFormResolver } from "../graph/formLookup";
 import type { BlueprintGraph } from "../api/types";
-import { prefillProviders } from "./providers";
+import { availablePrefillProviders } from "./providers";
 import { directFormFieldsProvider, transitiveFormFieldsProvider } from "./providers/upstreamFormFields";
 import { globalDataProvider } from "./providers/globalData";
 import type { PrefillProviderContext } from "./types";
@@ -98,10 +98,10 @@ describe("form field providers", () => {
 
 describe("provider registry", () => {
   it("registers distinct direct, transitive, and global identities", () => {
-    expect(prefillProviders.map((provider) => provider.id)).toEqual([
+    expect(availablePrefillProviders.map((provider) => provider.id)).toEqual([
       "direct_dependencies", "transitive_dependencies", "global",
     ]);
-    expect(prefillProviders.flatMap((provider) => provider.getOptionGroups(context())).map((group) => group.label))
+    expect(availablePrefillProviders.flatMap((provider) => provider.getOptionGroups(context())).map((group) => group.label))
       .toEqual(["Form B", "Form A", "Action Properties", "Client Organization Properties"]);
   });
 

@@ -46,6 +46,10 @@ self references/cycles, and field eligibility.
 
 ## Phase 2: Configure provider activation
 
+Status: implemented, pending pull-request review. All 99 tests and the production
+build pass. A built-file HTTP check confirmed JSON changes without a JavaScript
+rebuild. See [the Phase 2 summary](phase-2-summary.md) for behavior and limitations.
+
 Suggested commit: `feat: configure enabled prefill data sources`
 
 - Keep a registry of available provider implementations, separate from activation.
