@@ -31,5 +31,9 @@ export async function fetchActionBlueprintGraph(
     throw new Error(`Request to ${url} failed with status ${response.status}.`);
   }
 
-  return (await response.json()) as BlueprintGraph;
+  try {
+    return (await response.json()) as BlueprintGraph;
+  } catch (cause) {
+    throw new Error("The blueprint response is not valid JSON.", { cause });
+  }
 }

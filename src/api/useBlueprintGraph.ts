@@ -14,7 +14,9 @@ export function useBlueprintGraph(): BlueprintGraphState {
   useEffect(() => {
     const controller = new AbortController();
     fetchActionBlueprintGraph(controller.signal)
-      .then((graph) => setState({ status: "ready", graph }))
+      .then((graph) => {
+        if (!controller.signal.aborted) setState({ status: "ready", graph });
+      })
       .catch((error: Error) => {
         if (controller.signal.aborted) return;
         setState({ status: "error", error });

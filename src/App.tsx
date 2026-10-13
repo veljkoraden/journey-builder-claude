@@ -25,7 +25,7 @@ export default function App() {
 
   if (state.status === "error") {
     return (
-      <main className="app app--message">
+      <main className="app app--message" role="alert">
         <h1>Could not load blueprint</h1>
         <p>{state.error.message}</p>
       </main>
@@ -46,7 +46,8 @@ export default function App() {
     return <main className="app app--message" role="status">Loading blueprint and prefill sources…</main>;
   }
 
-  const selectedNode = graph!.nodes.find((node) => node.id === selectedNodeId);
+  const formNodes = graph!.nodes.filter((node) => node.data.component_type === "form");
+  const selectedNode = formNodes.find((node) => node.id === selectedNodeId);
   const selectedForm = selectedNode ? getFormForNode!(selectedNode) : undefined;
 
   const editingField =
@@ -67,7 +68,7 @@ export default function App() {
 
       <div className="app__body">
         <FormList
-          nodes={graph!.nodes}
+          nodes={formNodes}
           selectedNodeId={selectedNodeId}
           onSelect={(id) => {
             setSelectedNodeId(id);
@@ -84,6 +85,10 @@ export default function App() {
               onPickField={setEditingFieldId}
               onClearField={(fieldId) => clearMapping(selectedNode.id, fieldId)}
             />
+          ) : selectedNode ? (
+            <p role="alert">The form definition for {selectedNode.data.name} is unavailable.</p>
+          ) : formNodes.length === 0 ? (
+            <p role="status">No forms in this blueprint.</p>
           ) : (
             <p className="app__hint">Select a form to configure its prefill.</p>
           )}

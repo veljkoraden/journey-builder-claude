@@ -13,7 +13,9 @@ improvements, acceptance criteria, and suggested commit messages. Phase 1 separa
 source eligibility and dependency providers. Phase 2 adds runtime configuration;
 see [the Phase 2 explanation](docs/phase-2-summary.md). Phase 3 adds confirmed
 selection and keyboard interaction; see [the Phase 3 explanation](docs/phase-3-summary.md).
-Broader acceptance and final handoff remain planned.
+Phase 4 adds official-fixture acceptance tests and a real mock-server browser
+check; see [the Phase 4 explanation](docs/phase-4-summary.md). Final handoff remains
+Phase 5.
 
 ---
 
@@ -241,7 +243,15 @@ a test-only provider being selected and saved through the existing components.
 npm run test:run
 ```
 
-Tests cover individual layers and runtime configuration through the application:
+Tests cover individual layers, runtime configuration, and application workflows:
+
+- `App.acceptance.test.tsx` — the pinned official graph, sorted form discovery,
+  loading/network/HTTP/JSON errors, empty and missing data, shared-definition
+  mapping isolation, global root mapping, and session reset.
+- `api/client.test.ts` and `api/useBlueprintGraph.test.tsx` — request behavior,
+  error messages, abort cleanup, and stale StrictMode response protection.
+- `test/fixtures/officialGraph.json` — unchanged official fixture with commit and
+  checksum provenance in [the fixture notes](src/test/fixtures/README.md).
 
 - `prefill/configuration.test.ts` — all eight subsets, order, invalid settings,
   registry identity, HTTP/network errors, and malformed JSON.
@@ -264,6 +274,11 @@ Tests cover individual layers and runtime configuration through the application:
 ---
 
 ## Notes & trade-offs
+
+- **Graph loading:** request failures are shown as alerts. Invalid JSON gets a
+  readable error. Empty blueprints and missing form definitions have explicit
+  messages; only form nodes are listed. Full runtime schema validation is not
+  implemented: syntactically valid but incorrectly shaped JSON is still a risk.
 
 - **State is in memory.** `usePrefillMappings` is intentionally simple; its API
   would not change if backed by a persisted store or server.

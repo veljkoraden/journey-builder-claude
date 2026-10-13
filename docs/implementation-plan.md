@@ -95,6 +95,11 @@ enabled state per node. Do not prioritize it over the required mapping flow.
 
 ## Phase 4: Prove the complete workflow
 
+Status: implemented, pending pull-request review. All 142 tests and the production
+build pass. Chrome verified mapping flows against the existing mock server over
+real HTTP/CORS; error/empty browser scenarios used explicit interception. See
+[the Phase 4 summary](phase-4-summary.md) for evidence and limitations.
+
 Suggested commit: `test: cover prefill workflows and provider extensibility`
 
 - Add application-level tests around the fetched graph and user interactions.
