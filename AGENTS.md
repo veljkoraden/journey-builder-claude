@@ -15,7 +15,7 @@ Tests live beside their related modules. Production output goes to `dist/`.
 
 ## Build, Test, and Development Commands
 
-Run `npm install` to install dependencies. Start the separate `frontendchallengeserver` on port 3000 following `README.md`.
+Run `npm ci` to install the locked dependencies. Start the separate `frontendchallengeserver` on port 3000 following `README.md`.
 
 - `npm run dev`: start Vite, normally at `http://localhost:5173`.
 - `npm run typecheck`: check TypeScript without emitting JavaScript.
@@ -36,7 +36,7 @@ Use Vitest with jsdom, React Testing Library, user-event, and jest-dom. Name tes
 
 ## Commit & Pull Request Guidelines
 
-Git history is unavailable in this checkout. Recommended practice: use short, imperative commit subjects describing one focused change. PRs should explain behavior changes, link relevant issues, report validation commands and results, and include screenshots for UI changes.
+Use short, imperative commit subjects describing one focused change. The supplied starter is preserved in the first commit; phase improvements follow in separate PRs. PRs should explain behavior changes, link relevant issues, report validation commands and results, and include screenshots for UI changes.
 
 ## Architecture & Configuration
 

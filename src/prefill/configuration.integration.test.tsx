@@ -17,11 +17,11 @@ const tenantProvider: PrefillProvider = {
   }],
 };
 
-function ExtensionExample() {
+function ExtensionExample({ enabledSourceIds = ["tenant_settings"] }: { enabledSourceIds?: string[] }) {
   const { getFieldMap, setMapping } = usePrefillMappings();
   const targetNode = sampleGraph.nodes.find((node) => node.id === NODE_IDS.FORM_D)!;
   const providers = resolvePrefillProviders(
-    { enabledSourceIds: ["tenant_settings"] },
+    { enabledSourceIds },
     [...availablePrefillProviders, tenantProvider],
   );
   return (
@@ -63,4 +63,25 @@ it("distinguishes enabled providers with no eligible data from no enabled provid
     />,
   );
   expect(screen.getByRole("status")).toHaveTextContent("No available data elements for this form.");
+});
+
+
+it("combines a new provider with built-ins and confirms its identity independently", async () => {
+  render(<ExtensionExample enabledSourceIds={["global", "tenant_settings", "direct_dependencies"]} />);
+  const groups = screen.getAllByRole("group");
+  expect(groups.map((group) => group.querySelector("legend")?.textContent?.replace("▸ ", "")))
+    .toEqual(["Action Properties", "Client Organization Properties", "Tenant Settings", "Form Bdirect"]);
+  await userEvent.click(screen.getByRole("button", { name: "Tenant Settings" }));
+  await userEvent.click(screen.getByRole("button", { name: "locale" }));
+  expect(screen.getByLabelText("Saved mapping")).toHaveTextContent("{}");
+  await userEvent.click(screen.getByRole("button", { name: /^Select$/ }));
+  expect(JSON.parse(screen.getByLabelText("Saved mapping").textContent!)).toEqual({
+    email: { providerId: "tenant_settings", optionKey: "tenant:locale", label: "Tenant Settings.locale" },
+  });
+});
+
+it("does not activate a registered example until configuration enables it", () => {
+  render(<ExtensionExample enabledSourceIds={["global"]} />);
+  expect(screen.queryByRole("group", { name: "Tenant Settings" })).not.toBeInTheDocument();
+  expect(screen.getByRole("group", { name: "Action Properties" })).toBeInTheDocument();
 });
