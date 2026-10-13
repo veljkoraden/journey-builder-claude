@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react";
 import { useBlueprintGraph } from "./api/useBlueprintGraph";
 import { createFormResolver } from "./graph/formLookup";
-import { prefillProviders } from "./prefill/providers";
+import { usePrefillProviders } from "./prefill/usePrefillProviders";
 import { usePrefillMappings } from "./prefill/usePrefillMappings";
 import type { PrefillProviderContext } from "./prefill/types";
 import { FormList } from "./components/FormList";
@@ -11,6 +11,7 @@ import { getTargetFields } from "./prefill/fieldUtils";
 
 export default function App() {
   const state = useBlueprintGraph();
+  const providerState = usePrefillProviders();
   const { getFieldMap, setMapping, clearMapping } = usePrefillMappings();
 
   const [selectedNodeId, setSelectedNodeId] = useState<string>();
@@ -22,10 +23,6 @@ export default function App() {
     [graph],
   );
 
-  if (state.status === "loading") {
-    return <main className="app app--message">Loading blueprint…</main>;
-  }
-
   if (state.status === "error") {
     return (
       <main className="app app--message">
@@ -33,6 +30,20 @@ export default function App() {
         <p>{state.error.message}</p>
       </main>
     );
+  }
+
+  if (providerState.status === "error") {
+    return (
+      <main className="app app--message" role="alert">
+        <h1>Could not load prefill sources</h1>
+        <p>{providerState.error.message}</p>
+        <p>Check prefill-config.json and reload the page.</p>
+      </main>
+    );
+  }
+
+  if (state.status === "loading" || providerState.status === "loading") {
+    return <main className="app app--message" role="status">Loading blueprint and prefill sources…</main>;
   }
 
   const selectedNode = graph!.nodes.find((node) => node.id === selectedNodeId);
@@ -82,7 +93,7 @@ export default function App() {
       {selectedNode && editingField && modalContext && (
         <PrefillModal
           fieldTitle={editingField.title}
-          providers={prefillProviders}
+          providers={providerState.providers}
           context={modalContext}
           onClose={() => setEditingFieldId(undefined)}
           onSelect={(source) => {

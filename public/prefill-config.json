@@ -1,0 +1,7 @@
+{
+  "enabledSourceIds": [
+    "direct_dependencies",
+    "transitive_dependencies",
+    "global"
+  ]
+}
