@@ -24,7 +24,9 @@ export function PrefillEditor({
   return (
     <section className="prefill-editor" aria-label={`Prefill for ${node.data.name}`}>
       <h2 className="prefill-editor__title">{node.data.name}</h2>
-      <p className="prefill-editor__subtitle">Prefill</p>
+      <h3 className="prefill-editor__heading">Prefill</h3>
+      <p className="prefill-editor__subtitle">Prefill fields for this form</p>
+      {fields.length === 0 && <p>No configurable fields in this form.</p>}
       <ul className="prefill-editor__fields">
         {fields.map((field) => (
           <PrefillField

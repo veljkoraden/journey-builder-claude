@@ -1,3 +1,4 @@
+import { useRef } from "react";
 import type { ConfigurableField } from "../prefill/fieldUtils";
 import type { PrefillSource } from "../prefill/types";
 
@@ -14,11 +15,12 @@ interface PrefillFieldProps {
  */
 export function PrefillField({ field, source, onOpen, onClear }: PrefillFieldProps) {
   const configured = Boolean(source);
+  const mainRef = useRef<HTMLButtonElement>(null);
 
   return (
     <li className={"prefill-field" + (configured ? " prefill-field--set" : "")}>
-      <button type="button" className="prefill-field__main" onClick={onOpen}>
-        <span className="prefill-field__name">{field.title}</span>
+      <button ref={mainRef} type="button" className="prefill-field__main" onClick={onOpen}>
+        <span className="prefill-field__name">{field.title}{configured ? ":" : ""}</span>
         {configured ? (
           <span className="prefill-field__value">{source?.label}</span>
         ) : (
@@ -31,7 +33,10 @@ export function PrefillField({ field, source, onOpen, onClear }: PrefillFieldPro
           type="button"
           className="prefill-field__clear"
           aria-label={`Clear prefill for ${field.title}`}
-          onClick={onClear}
+          onClick={() => {
+            mainRef.current?.focus();
+            onClear();
+          }}
         >
           ×
         </button>

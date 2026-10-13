@@ -41,7 +41,9 @@ function ExtensionExample() {
 it("selects and stores a future provider's opaque identity without UI or store changes", async () => {
   render(<ExtensionExample />);
   expect(screen.queryByText("Form B")).not.toBeInTheDocument();
+  await userEvent.click(screen.getByRole("button", { name: "Tenant Settings" }));
   await userEvent.click(screen.getByRole("button", { name: "locale" }));
+  await userEvent.click(screen.getByRole("button", { name: /^Select$/ }));
   expect(JSON.parse(screen.getByLabelText("Saved mapping").textContent!)).toEqual({
     email: {
       providerId: "tenant_settings", optionKey: "tenant:locale", label: "Tenant Settings.locale",

@@ -52,3 +52,35 @@ body { margin: 0; background: var(--bg); }
 .modal__option { width: 100%; text-align: left; padding: 6px 8px; border: none; border-radius: 6px; background: none; cursor: pointer; font-size: 14px; }
 .modal__option:hover { background: var(--accent-soft); color: var(--accent); }
 .modal__empty { color: var(--muted); font-size: 14px; }
+
+button, input { font: inherit; }
+button:focus-visible, input:focus-visible { outline: 3px solid var(--accent); outline-offset: 3px; }
+button:disabled { cursor: default; }
+.app__detail { min-width: 0; }
+.prefill-editor__heading { color: var(--text); font-size: 22px; margin: 12px 0 4px; }
+.prefill-field__main { min-width: 0; overflow-wrap: anywhere; }
+.prefill-field--set { border-radius: 24px; background: var(--accent-soft); gap: 0; }
+.prefill-field--set .prefill-field__main { flex-direction: row; align-items: center; flex-wrap: wrap; gap: 6px; border: none; border-radius: 24px; }
+.prefill-field--set .prefill-field__clear { background: transparent; border: none; border-radius: 24px; flex-shrink: 0; }
+.modal-backdrop { z-index: 10; }
+.modal { max-width: 600px; max-height: calc(100dvh - 48px); }
+.modal__title { overflow-wrap: anywhere; }
+.modal__search-label { margin-top: 16px; font-size: 14px; }
+.modal__search { margin-top: 6px; flex-shrink: 0; }
+.modal__groups { min-height: 0; }
+.modal__group { min-width: 0; }
+.modal__group-toggle { display: flex; align-items: center; gap: 8px; text-align: left; border: none; background: transparent; color: var(--text); padding: 4px; cursor: pointer; overflow-wrap: anywhere; }
+.modal__options[hidden] { display: none; }
+.modal__option { overflow-wrap: anywhere; }
+.modal__option[aria-pressed="true"] { color: var(--accent); background: var(--accent-soft); font-weight: 600; box-shadow: inset 3px 0 var(--accent); }
+.modal__selection { font-size: 14px; overflow-wrap: anywhere; color: var(--text); }
+.modal__footer { display: flex; justify-content: flex-end; gap: 12px; border-top: 1px solid var(--border); padding-top: 12px; }
+.modal__footer button { padding: 8px 18px; border: 1px solid var(--border); border-radius: 6px; background: var(--surface); cursor: pointer; }
+.modal__footer button:last-child { background: var(--accent); color: white; border-color: var(--accent); }
+.modal__footer button:disabled { background: var(--border); border-color: var(--border); color: var(--muted); cursor: default; }
+@media (max-width: 600px) {
+  .app { padding: 16px; }
+  .app__body { grid-template-columns: minmax(0, 1fr); }
+  .modal-backdrop { padding: 12px; }
+  .modal { max-height: calc(100dvh - 24px); padding: 12px; }
+}

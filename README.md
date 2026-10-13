@@ -11,7 +11,9 @@ configuration. New implementations are added through the provider registry.
 See [the phased implementation plan](docs/implementation-plan.md) for planned
 improvements, acceptance criteria, and suggested commit messages. Phase 1 separates
 source eligibility and dependency providers. Phase 2 adds runtime configuration;
-see [the Phase 2 explanation](docs/phase-2-summary.md). Later phases remain planned.
+see [the Phase 2 explanation](docs/phase-2-summary.md). Phase 3 adds confirmed
+selection and keyboard interaction; see [the Phase 3 explanation](docs/phase-3-summary.md).
+Broader acceptance and final handoff remain planned.
 
 ---
 
@@ -60,8 +62,20 @@ Clicking a form opens its **prefill editor**, which lists the form's data
 fields. Each field is either:
 
 - **configured** — shows the mapped source (e.g. `Form A.email`) with an `×`
-  button to clear it, or
+  button to clear it (click the mapping to choose a replacement), or
 - **empty** — clicking it opens the **prefill modal**.
+
+The modal starts with collapsed source groups. Expand a group, or search by
+field/group name to reveal matches. Clicking a field creates a temporary choice;
+**Select** applies it. **Cancel**, Close, Escape, or a backdrop click discards the
+choice. Reopening starts with an empty draft and search, even for a mapped field.
+The saved mapping remains until a replacement is confirmed or explicitly cleared.
+
+Search can hide a draft's group without deleting the draft: the selected-source
+summary stays visible so confirmation is explicit. Groups are automatically open
+while searching, and their disclosure controls are disabled during search.
+Keyboard focus starts in labeled search, stays within the modal, and returns to
+the originating row on dismissal. Clearing returns focus to the unmapped row.
 
 The modal aggregates options from every enabled data source:
 
@@ -102,7 +116,8 @@ src/
     FormList.tsx           list of forms
     PrefillEditor.tsx      a form's fields + their mappings
     PrefillField.tsx       one field row (set / empty)
-    PrefillModal.tsx       source picker, aggregates all providers
+    PrefillModal.tsx       draft selection, confirmation, and modal focus
+    PrefillSourceGroup.tsx expandable group of provider-neutral choices
   App.tsx                  wires data + state + UI together
   mocks/sampleGraph.ts     fixture used by tests
 ```

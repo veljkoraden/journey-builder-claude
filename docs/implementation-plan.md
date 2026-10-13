@@ -69,6 +69,10 @@ The runtime file is loaded at startup; live configuration editing is not require
 
 ## Phase 3: Complete mapping interactions
 
+Status: implemented, pending pull-request review. All 119 tests and the production
+build pass. Desktop/mobile Chrome checks used the official graph fixture via
+request interception. See [the Phase 3 summary](phase-3-summary.md) and screenshots.
+
 Suggested commit: `feat: confirm and manage prefill selections`
 
 - Retain the form list and selected-form context. Show the Prefill heading,
