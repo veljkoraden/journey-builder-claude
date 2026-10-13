@@ -7,7 +7,7 @@ import type { PrefillProviderContext } from "./prefill/types";
 import { FormList } from "./components/FormList";
 import { PrefillEditor } from "./components/PrefillEditor";
 import { PrefillModal } from "./components/PrefillModal";
-import { getConfigurableFields } from "./prefill/fieldUtils";
+import { getTargetFields } from "./prefill/fieldUtils";
 
 export default function App() {
   const state = useBlueprintGraph();
@@ -40,7 +40,7 @@ export default function App() {
 
   const editingField =
     selectedForm && editingFieldId
-      ? getConfigurableFields(selectedForm).find((f) => f.name === editingFieldId)
+      ? getTargetFields(selectedForm).find((f) => f.name === editingFieldId)
       : undefined;
 
   const modalContext: PrefillProviderContext | undefined =

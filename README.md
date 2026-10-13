@@ -3,14 +3,14 @@
 A small React + TypeScript app for the Avantos take-home. It fetches a form DAG
 from the `action-blueprint-graph-get` endpoint, lists the forms, and lets you
 view and edit the **prefill mapping** for each form's fields. Prefill sources
-are pluggable: you can add, remove, or reorder them without touching consumer
-code.
+are pluggable: you can add, remove, or reorder them in the provider registry
+without touching consumer code.
 
 ## Implementation roadmap
 
 See [the phased implementation plan](docs/implementation-plan.md) for planned
-improvements, acceptance criteria, and suggested commit messages. The current
-application is the starter baseline; the plan describes work still to implement.
+improvements, acceptance criteria, and suggested commit messages. Phase 1 separates
+source eligibility and dependency providers; later phases remain planned.
 
 ---
 
@@ -127,14 +127,15 @@ All active providers live in one array:
 ```ts
 // src/prefill/providers/index.ts
 export const prefillProviders: PrefillProvider[] = [
-  upstreamFormFieldsProvider, // direct + transitive form fields
+  directFormFieldsProvider,
+  transitiveFormFieldsProvider,
   globalDataProvider,         // global properties
 ];
 ```
 
-This is what makes "any combination of these data sources can be used without
-code changes" true: the modal iterates the array, so adding/removing/reordering
-sources is an edit to this one list.
+The modal consumes any combination of these providers without UI changes.
+Activation currently requires editing this registry; external runtime
+configuration without application code changes is planned for Phase 2.
 
 ---
 
@@ -164,15 +165,16 @@ Suppose you want to add a "Tenant settings" source.
    ```
 
    A provider may use the `context` (graph / target node / form resolver) to
-   compute options dynamically — that is exactly how the upstream-form provider
-   walks the DAG.
+   compute options dynamically — that is exactly how the dependency providers
+   walk the DAG.
 
 2. **Register it** by appending to the array in
    `src/prefill/providers/index.ts`:
 
    ```ts
    export const prefillProviders: PrefillProvider[] = [
-     upstreamFormFieldsProvider,
+     directFormFieldsProvider,
+     transitiveFormFieldsProvider,
      globalDataProvider,
      tenantSettingsProvider, // <-- new source appears in the modal automatically
    ];
@@ -193,7 +195,7 @@ Tests cover each layer independently:
 
 - `graph/traversal.test.ts` — direct vs transitive dependency resolution, BFS
   ordering, and de-duplication of a shared root (Form A reached via two paths).
-- `prefill/providers.test.ts` — the upstream provider emits one group per
+- `prefill/providers.test.ts` — the dependency providers emit one group per
   ancestor with correct `direct`/`transitive` badges and option keys; the
   registry aggregates groups from every provider.
 - `prefill/usePrefillMappings.test.ts` — set/clear semantics and node isolation.
@@ -206,8 +208,18 @@ Tests cover each layer independently:
 
 - **State is in memory.** `usePrefillMappings` is intentionally simple; its API
   would not change if backed by a persisted store or server.
-- **`button` fields are excluded** from configurable fields (they are actions,
-  not data). The filter lives in one place (`fieldUtils.ts`).
+- **Field eligibility is explicit.** `getTargetFields` excludes button widgets
+  from editable targets. `getSourceFields` includes all schema-provided fields,
+  including buttons shown in the reference picker. No absent fields are invented.
+- **Dependency policy:** node `prerequisites` are authoritative. Direct sources
+  take precedence over indirect paths; shared ancestors are deduplicated.
+  Missing node/form references, non-form sources, and empty groups are skipped.
+  Traversal can pass through non-form nodes and nodes with missing form definitions.
+  Cyclic input terminates without offering the target itself; this is defensive
+  traversal, not complete DAG validation.
+- **Source identity:** dependency providers now use `direct_dependencies` and
+  `transitive_dependencies`; option keys remain `nodeId:fieldName`. Labels do not
+  determine identity. There is no persisted mapping migration: state is session-only.
 - **Styling is minimal and hand-written** — the brief states the UI "doesn't
   need to be pretty," and the emphasis is on readable, ownable code rather than
   a design system.

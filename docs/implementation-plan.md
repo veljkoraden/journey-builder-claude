@@ -26,6 +26,10 @@ Each phase below should include its relevant tests and a clear commit message.
 
 ## Phase 1: Define source eligibility
 
+Status: implemented, pending pull-request review. Validation: 42 tests across six
+files and the production build pass. Runtime configuration and modal confirmation
+remain deferred to subsequent phases. No browser/mock-server acceptance is claimed.
+
 Suggested commit: `refactor: separate direct and transitive prefill sources`
 
 - Share traversal and field conversion utilities across independent direct and

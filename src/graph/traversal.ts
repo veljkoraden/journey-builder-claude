@@ -5,39 +5,49 @@ export function indexNodesById(graph: BlueprintGraph): Map<string, GraphNode> {
   return new Map(graph.nodes.map((node) => [node.id, node]));
 }
 
-/** Direct prerequisites (the forms a node depends on immediately). */
+/** Existing immediate prerequisites, in declared order, without duplicates/self. */
 export function getDirectDependencyIds(
   graph: BlueprintGraph,
   nodeId: string,
 ): string[] {
-  const node = graph.nodes.find((candidate) => candidate.id === nodeId);
-  return node ? [...node.data.prerequisites] : [];
+  const nodesById = indexNodesById(graph);
+  return [...new Set(nodesById.get(nodeId)?.data.prerequisites ?? [])].filter(
+    (id) => id !== nodeId && nodesById.has(id),
+  );
 }
 
 /**
- * All upstream ancestors of a node, in breadth-first order (nearest first),
- * de-duplicated. Cycle-safe even though a well-formed blueprint is acyclic.
- *
- * For Form D this yields [Form B (direct), Form A (transitive)].
+ * Existing upstream nodes in breadth-first order, nearest first.
+ * Prerequisites are authoritative. Ignore dangling references and never return
+ * the target itself, even on malformed cyclic input. This is not DAG validation.
  */
 export function getAncestorIds(
   graph: BlueprintGraph,
   nodeId: string,
 ): string[] {
   const nodesById = indexNodesById(graph);
-  const visited = new Set<string>();
+  const visited = new Set<string>([nodeId]);
   const ordered: string[] = [];
-  const queue: string[] = [...(nodesById.get(nodeId)?.data.prerequisites ?? [])];
+  const queue = [...(nodesById.get(nodeId)?.data.prerequisites ?? [])];
 
-  while (queue.length > 0) {
-    const currentId = queue.shift() as string;
+  for (let index = 0; index < queue.length; index += 1) {
+    const currentId = queue[index];
     if (visited.has(currentId)) continue;
     visited.add(currentId);
-    ordered.push(currentId);
-
     const current = nodesById.get(currentId);
-    if (current) queue.push(...current.data.prerequisites);
+    if (!current) continue;
+    ordered.push(currentId);
+    queue.push(...current.data.prerequisites);
   }
 
   return ordered;
+}
+
+/** Indirect ancestors only; direct dependencies take precedence on shared paths. */
+export function getTransitiveDependencyIds(
+  graph: BlueprintGraph,
+  nodeId: string,
+): string[] {
+  const directIds = new Set(getDirectDependencyIds(graph, nodeId));
+  return getAncestorIds(graph, nodeId).filter((id) => !directIds.has(id));
 }
