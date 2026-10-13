@@ -1,5 +1,5 @@
 import type { PrefillProvider } from "../types";
-import { upstreamFormFieldsProvider } from "./upstreamFormFields";
+import { directFormFieldsProvider, transitiveFormFieldsProvider } from "./upstreamFormFields";
 import { globalDataProvider } from "./globalData";
 
 /**
@@ -12,6 +12,7 @@ import { globalDataProvider } from "./globalData";
  * No other code changes are required.
  */
 export const prefillProviders: PrefillProvider[] = [
-  upstreamFormFieldsProvider,
+  directFormFieldsProvider,
+  transitiveFormFieldsProvider,
   globalDataProvider,
 ];

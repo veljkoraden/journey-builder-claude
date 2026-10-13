@@ -1,42 +1,48 @@
-import { getAncestorIds, getDirectDependencyIds, indexNodesById } from "../../graph/traversal";
-import { getConfigurableFields } from "../fieldUtils";
+import {
+  getDirectDependencyIds,
+  getTransitiveDependencyIds,
+  indexNodesById,
+} from "../../graph/traversal";
+import { getSourceFields } from "../fieldUtils";
 import type { PrefillProvider } from "../types";
 
-/** Provider id stored on every form-field mapping. */
-export const FORM_FIELD_PROVIDER_ID = "form_field";
+type DependencyScope = "direct" | "transitive";
 
-/**
- * Offers the fields of every upstream form as prefill sources — one group per
- * ancestor. This single provider covers both requirement 1 (direct
- * dependencies) and requirement 2 (transitive dependencies): "transitive" is
- * just an ancestor that is not a direct prerequisite. The relationship is
- * surfaced as a `badge` so the UI can distinguish them.
- */
-export const upstreamFormFieldsProvider: PrefillProvider = {
-  id: FORM_FIELD_PROVIDER_ID,
-  label: "Form fields",
-  getOptionGroups: ({ graph, targetNode, getFormForNode }) => {
-    const directIds = new Set(getDirectDependencyIds(graph, targetNode.id));
-    const nodesById = indexNodesById(graph);
+/** Both providers share field conversion while selecting disjoint node sets. */
+function createFormFieldsProvider(scope: DependencyScope): PrefillProvider {
+  return {
+    id: `${scope}_dependencies`,
+    label: scope === "direct" ? "Direct dependencies" : "Transitive dependencies",
+    getOptionGroups: ({ graph, targetNode, getFormForNode }) => {
+      const nodeIds =
+        scope === "direct"
+          ? getDirectDependencyIds(graph, targetNode.id)
+          : getTransitiveDependencyIds(graph, targetNode.id);
+      const nodesById = indexNodesById(graph);
 
-    return getAncestorIds(graph, targetNode.id).flatMap((ancestorId) => {
-      const node = nodesById.get(ancestorId);
-      if (!node) return [];
+      return nodeIds.flatMap((nodeId) => {
+        const node = nodesById.get(nodeId);
+        if (!node || node.data.component_type !== "form") return [];
+        const form = getFormForNode(node);
+        if (!form) return [];
+        const options = getSourceFields(form).map((field) => ({
+          key: `${node.id}:${field.name}`,
+          label: field.name,
+        }));
+        if (options.length === 0) return [];
 
-      const form = getFormForNode(node);
-      if (!form) return [];
+        return [
+          {
+            id: node.id,
+            label: node.data.name,
+            badge: scope,
+            options,
+          },
+        ];
+      });
+    },
+  };
+}
 
-      return [
-        {
-          id: node.id,
-          label: node.data.name,
-          badge: directIds.has(ancestorId) ? "direct" : "transitive",
-          options: getConfigurableFields(form).map((field) => ({
-            key: `${node.id}:${field.name}`,
-            label: field.name,
-          })),
-        },
-      ];
-    });
-  },
-};
+export const directFormFieldsProvider = createFormFieldsProvider("direct");
+export const transitiveFormFieldsProvider = createFormFieldsProvider("transitive");

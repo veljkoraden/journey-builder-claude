@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
 import { PrefillModal } from "./PrefillModal";
@@ -43,14 +43,44 @@ describe("PrefillModal", () => {
       />,
     );
 
-    // Narrow to Form A's email option via search, then click it.
+    // Select the exact source group, independent of provider display order.
     await userEvent.type(screen.getByPlaceholderText("Search fields"), "email");
-    const emailButtons = screen.getAllByRole("button", { name: "email" });
-    await userEvent.click(emailButtons[emailButtons.length - 1]);
+    const group = screen.getByRole("group", { name: /Form A/ });
+    await userEvent.click(within(group).getByRole("button", { name: "email" }));
 
     expect(onSelect).toHaveBeenCalledTimes(1);
-    const arg = onSelect.mock.calls[0][0];
-    expect(arg.providerId).toBe("form_field");
-    expect(arg.label).toMatch(/^Form [AB]\.email$/);
+    expect(onSelect).toHaveBeenCalledWith({
+      providerId: "transitive_dependencies",
+      optionKey: `${NODE_IDS.FORM_A}:email`,
+      label: "Form A.email",
+    });
+  });
+});
+
+
+describe("independent dependency sources in the picker", () => {
+  it.each([
+    ["direct_dependencies", "Form B", "Form A", NODE_IDS.FORM_B],
+    ["transitive_dependencies", "Form A", "Form B", NODE_IDS.FORM_A],
+  ])("renders and selects button sources from %s alone", async (id, name, absent, nodeId) => {
+    const onSelect = vi.fn();
+    render(
+      <PrefillModal
+        fieldTitle="Email"
+        providers={prefillProviders.filter((provider) => provider.id === id)}
+        context={context()}
+        onSelect={onSelect}
+        onClose={vi.fn()}
+      />,
+    );
+    expect(screen.queryByText(absent)).not.toBeInTheDocument();
+    expect(screen.queryByText("Action Properties")).not.toBeInTheDocument();
+    const group = screen.getByRole("group", { name: new RegExp(name) });
+    await userEvent.click(within(group).getByRole("button", { name: "button" }));
+    expect(onSelect).toHaveBeenCalledWith({
+      providerId: id,
+      optionKey: `${nodeId}:button`,
+      label: `${name}.button`,
+    });
   });
 });

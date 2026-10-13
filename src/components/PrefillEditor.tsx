@@ -1,5 +1,5 @@
 import type { FormDefinition, GraphNode } from "../api/types";
-import { getConfigurableFields } from "../prefill/fieldUtils";
+import { getTargetFields } from "../prefill/fieldUtils";
 import type { FieldPrefillMap } from "../prefill/types";
 import { PrefillField } from "./PrefillField";
 
@@ -19,7 +19,7 @@ export function PrefillEditor({
   onPickField,
   onClearField,
 }: PrefillEditorProps) {
-  const fields = getConfigurableFields(form);
+  const fields = getTargetFields(form);
 
   return (
     <section className="prefill-editor" aria-label={`Prefill for ${node.data.name}`}>
