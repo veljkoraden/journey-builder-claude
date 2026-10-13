@@ -6,6 +6,12 @@ view and edit the **prefill mapping** for each form's fields. Prefill sources
 are pluggable: you can add, remove, or reorder them without touching consumer
 code.
 
+## Implementation roadmap
+
+See [the phased implementation plan](docs/implementation-plan.md) for planned
+improvements, acceptance criteria, and suggested commit messages. The current
+application is the starter baseline; the plan describes work still to implement.
+
 ---
 
 ## Running locally
